@@ -1,0 +1,4 @@
+/target
+credentials.json
+*.log
+monitor.sh
