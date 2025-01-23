@@ -9,7 +9,8 @@ WORKDIR /app
 # Install host build dependencies.
 RUN echo "deb http://deb.debian.org/debian bookworm-backports main" > /etc/apt/sources.list.d/bookworm-backports.list && \
     apt-get update && \
-    apt-get install -y pkg-config libclang-dev libheif1/bookworm-backports libheif-dev/bookworm-backports
+    apt-get install -y pkg-config libclang-dev libheif1/bookworm-backports libheif-dev/bookworm-backports && \
+    cc --version
 
 # Build the application.
 RUN --mount=type=bind,source=src,target=src \
