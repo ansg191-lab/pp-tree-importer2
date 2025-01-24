@@ -28,12 +28,6 @@ jobs:
         uses: catchpoint/workflow-telemetry-action@v2
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
 
-      - name: Free disk space
-        uses: jlumbroso/free-disk-space@v1.3.1
-        with:
-          tool-cache: true
-          docker-images: false
-
       # https://github.com/docker/setup-qemu-action
       - name: Set up QEMU
         uses: docker/setup-qemu-action@49b3bc8e6bdd4a60e6116a5414239cba5943d3cf # v3
