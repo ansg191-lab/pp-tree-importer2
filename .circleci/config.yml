@@ -1,0 +1,115 @@
+# This config was automatically generated from your source code
+# Stacks detected: cicd:github-actions:.github/workflows,deps:rust:.
+version: 2.1
+orbs:
+  rust: circleci/rust@1.6.2
+jobs:
+  clippy-rust:
+    docker:
+      - image: rust:1.84-bookworm
+    environment:
+      RUSTFLAGS: "-D warnings"
+    steps:
+      - checkout
+      - run:
+          command: |
+            echo "deb http://deb.debian.org/debian bookworm-backports main" > /etc/apt/sources.list.d/bookworm-backports.list
+            apt-get update
+            apt-get install -y pkg-config libclang-dev libheif1/bookworm-backports libheif-dev/bookworm-backports
+      - rust/clippy
+  test-rust:
+    docker:
+      - image: rust:1.84-bookworm
+    steps:
+      - checkout
+      - run:
+          command: |
+            echo "deb http://deb.debian.org/debian bookworm-backports main" > /etc/apt/sources.list.d/bookworm-backports.list
+            apt-get update
+            apt-get install -y pkg-config libclang-dev libheif1/bookworm-backports libheif-dev/bookworm-backports
+      - restore_cache:
+          key: cargo-{{ checksum "Cargo.lock" }}
+      - run:
+          command: cargo test
+      - save_cache:
+          key: cargo-{{ checksum "Cargo.lock" }}
+          paths:
+            - ~/.cargo
+
+  docker-build-arm64:
+    resource_class: arm-medium
+    docker:
+      - image: cimg/base:current
+        auth:
+          username: ansg191
+          password: $DOCKERHUB_PASSWORD
+    steps:
+      - checkout
+      - setup_remote_docker:
+          docker_layer_caching: true
+      - run:
+          name: Build Docker image
+          command: |
+            TAG=latest-arm64
+            docker build -t ansg191/pp-tree-importer2:$TAG --progress=plain .
+      - run:
+          name: Push Docker image
+          command: |
+            TAG=latest-arm64
+            echo $DOCKERHUB_PASSWORD | docker login -u ansg191 --password-stdin
+            docker push ansg191/pp-tree-importer2:$TAG
+
+  docker-build-amd64:
+    resource_class: medium
+    docker:
+      - image: cimg/base:current
+        auth:
+          username: ansg191
+          password: $DOCKERHUB_PASSWORD
+    steps:
+      - checkout
+      - setup_remote_docker:
+          docker_layer_caching: true
+      - run:
+          name: Build Docker image
+          command: |
+            TAG=latest-amd64
+            docker build -t ansg191/pp-tree-importer2:$TAG --progress=plain .
+      - run:
+          name: Push Docker image
+          command: |
+            TAG=latest-amd64
+            echo $DOCKERHUB_PASSWORD | docker login -u ansg191 --password-stdin
+            docker push ansg191/pp-tree-importer2:$TAG
+
+  docker-build:
+    docker:
+      - image: cimg/base:current
+        auth:
+          username: ansg191
+          password: $DOCKERHUB_PASSWORD
+    steps:
+      - checkout
+      - setup_remote_docker:
+          docker_layer_caching: true
+      - run:
+          name: Create Multi-Arch Manifest
+          command: |
+            TAG=latest
+            echo $DOCKERHUB_PASSWORD | docker login -u ansg191 --password-stdin
+            docker manifest create ansg191/pp-tree-importer2:$TAG \
+              --amend ansg191/pp-tree-importer2:$TAG-amd64 \
+              --amend ansg191/pp-tree-importer2:$TAG-arm64
+            docker manifest push ansg191/pp-tree-importer2:$TAG
+
+workflows:
+  build-and-test:
+    jobs:
+      - test-rust
+      - clippy-rust
+      - docker-build-arm64
+      - docker-build-amd64
+      - docker-build:
+          requires:
+            - docker-build-arm64
+            - docker-build-amd64
