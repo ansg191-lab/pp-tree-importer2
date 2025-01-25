@@ -2,7 +2,6 @@
 # Stacks detected: cicd:github-actions:.github/workflows,deps:rust:.
 version: 2.1
 orbs:
-  rust: circleci/rust@1.6.2
   docker: circleci/docker@2.8.1
 
 commands:
@@ -25,7 +24,20 @@ jobs:
     steps:
       - checkout
       - install_deps
-      - rust/clippy
+      - restore_cache:
+          key: cargo-clippy-rust-v1-{{ checksum "Cargo.lock" }}
+      - run:
+          name: Install Clippy
+          command: rustup component add clippy
+      - run:
+          name: Run Clippy
+          command: cargo clippy --all --all-targets
+      - save_cache:
+          key: cargo-clippy-rust-v1-{{ checksum "Cargo.lock" }}
+          paths:
+            - /usr/local/cargo
+            - target
+
   test-rust:
     docker:
       - image: rust:1.84-bookworm
