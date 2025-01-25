@@ -163,3 +163,40 @@ fn get_timestamp(exif: &Exif) -> Result<OffsetDateTime, Error> {
     );
     Ok(OffsetDateTime::parse(full_datetime.as_str(), FORMAT)?)
 }
+
+#[cfg(test)]
+mod tests {
+    use approx::{assert_relative_eq};
+    use time::{Month, UtcOffset};
+
+    use super::*;
+
+    #[test]
+    fn test_get_timestamp() {
+        let img = std::fs::read("fixtures/IMG_0406.HEIC").unwrap();
+        let exif = Reader::new()
+            .read_from_container(&mut Cursor::new(img))
+            .unwrap();
+
+        let timestamp = get_timestamp(&exif).unwrap();
+        assert_eq!(timestamp.year(), 2025);
+        assert_eq!(timestamp.month(), Month::January);
+        assert_eq!(timestamp.day(), 18);
+        assert_eq!(timestamp.hour(), 12);
+        assert_eq!(timestamp.minute(), 14);
+        assert_eq!(timestamp.second(), 0);
+        assert_eq!(timestamp.offset(), UtcOffset::from_hms(-8, 0, 0).unwrap());
+    }
+
+    #[test]
+    fn test_location() {
+        let img = std::fs::read("fixtures/20250121_065541.jpg").unwrap();
+        let exif = Reader::new()
+            .read_from_container(&mut Cursor::new(img))
+            .unwrap();
+
+        let location = Location::from_image(&exif).unwrap();
+        assert_relative_eq!(location.lat, 33.716812, epsilon = 0.00001);
+        assert_relative_eq!(location.lon, -117.759817, epsilon = 0.00001);
+    }
+}
