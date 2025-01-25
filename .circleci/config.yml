@@ -23,18 +23,26 @@ jobs:
     steps:
       - checkout
       - run:
+          name: Install runtime deps
           command: |
             echo "deb http://deb.debian.org/debian bookworm-backports main" > /etc/apt/sources.list.d/bookworm-backports.list
             apt-get update
             apt-get install -y pkg-config libclang-dev libheif1/bookworm-backports libheif-dev/bookworm-backports
       - restore_cache:
-          key: cargo-{{ checksum "Cargo.lock" }}
+          key: cargo-test-rust-{{ checksum "Cargo.lock" }}
       - run:
-          command: cargo test
+          name: Install cargo-nextest
+          command: curl -LsSf https://get.nexte.st/latest/linux | tar zxf - -C ${CARGO_HOME:-~/.cargo}/bin
+      - run:
+          name: Run tests
+          command: cargo nextest -P ci run
+      - store_test_results:
+          path: target/nextest/ci
       - save_cache:
-          key: cargo-{{ checksum "Cargo.lock" }}
+          key: cargo-test-rust-{{ checksum "Cargo.lock" }}
           paths:
             - ~/.cargo
+            - target
 
   docker-build-arm64:
     resource_class: arm-medium

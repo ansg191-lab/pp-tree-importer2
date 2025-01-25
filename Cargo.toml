@@ -32,3 +32,23 @@ tracing-subscriber = { version = "0.3.19", features = ["env-filter", "json"] }
 unwrap-infallible = "0.1.5"
 webp = "0.3.0"
 yup-oauth2 = "11.0.0"
+
+# Speed up debug builds
+[profile.dev.package.image]
+opt-level = 3
+[profile.dev.package.webp]
+opt-level = 3
+[profile.dev.package.libwebp-sys]
+opt-level = 3
+[profile.dev.package.zune-jpeg]
+opt-level = 3
+
+# Speed up tests
+[profile.test.package.image]
+opt-level = 3
+[profile.test.package.webp]
+opt-level = 3
+[profile.test.package.libwebp-sys]
+opt-level = 3
+[profile.test.package.zune-jpeg]
+opt-level = 3

@@ -1,6 +1,7 @@
 credentials.json
 *.log
 monitor.sh
+flamegraph.svg
 
 # Created by https://www.toptal.com/developers/gitignore/api/macos,windows,linux,intellij+all,visualstudiocode,rust
 # Edit at https://www.toptal.com/developers/gitignore?templates=macos,windows,linux,intellij+all,visualstudiocode,rust

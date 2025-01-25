@@ -46,3 +46,42 @@ impl Converter for General {
         Ok(WebpOutput { large, small })
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use image::ImageFormat;
+
+    use super::*;
+
+    #[test]
+    fn convert() {
+        let file = std::fs::read("fixtures/20250121_065541.jpg").unwrap();
+        let bytes = Bytes::from(file);
+
+        let converter = General;
+        let output = converter.convert(bytes.clone()).unwrap();
+
+        assert!(
+            output.small.len() < output.large.len(),
+            "Small image should be smaller than large image"
+        );
+        assert!(
+            output.small.len() < bytes.len(),
+            "Small image should be smaller than original image"
+        );
+        assert!(
+            output.large.len() < bytes.len(),
+            "Large image should be smaller than original image"
+        );
+
+        let small = image::load_from_memory_with_format(&output.small, ImageFormat::WebP).unwrap();
+        assert_eq!(small.width(), 600);
+        assert_eq!(small.height(), 1333);
+        assert_eq!(small.color(), image::ColorType::Rgb8);
+
+        let large = image::load_from_memory_with_format(&output.large, ImageFormat::WebP).unwrap();
+        assert_eq!(large.width(), 1800);
+        assert_eq!(large.height(), 4000);
+        assert_eq!(large.color(), image::ColorType::Rgb8);
+    }
+}
