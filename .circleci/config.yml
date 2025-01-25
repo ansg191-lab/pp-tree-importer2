@@ -130,8 +130,16 @@ workflows:
       - test-rust
       - clippy-rust
       - format-rust
-      - docker-build-arm64
-      - docker-build-amd64
+      - docker-build-arm64:
+          requires:
+            - test-rust
+            - clippy-rust
+            - format-rust
+      - docker-build-amd64:
+          requires:
+            - test-rust
+            - clippy-rust
+            - format-rust
       - docker-build:
           requires:
             - docker-build-arm64
