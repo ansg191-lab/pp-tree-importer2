@@ -166,7 +166,7 @@ fn get_timestamp(exif: &Exif) -> Result<OffsetDateTime, Error> {
 
 #[cfg(test)]
 mod tests {
-    use approx::{assert_relative_eq};
+    use approx::assert_relative_eq;
     use time::{Month, UtcOffset};
 
     use super::*;

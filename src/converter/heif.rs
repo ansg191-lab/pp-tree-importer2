@@ -67,10 +67,10 @@ impl Converter for HeifConverter {
     }
 }
 
-
 #[cfg(test)]
 mod tests {
     use image::ImageFormat;
+
     use super::*;
 
     #[test]
