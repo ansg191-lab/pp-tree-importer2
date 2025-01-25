@@ -54,13 +54,13 @@ impl Converter for HeifConverter {
         let large = {
             let encoder = Encoder::from_image(&image).expect("WEBP encoding implemented for RGB");
             let webp = encoder.encode(75.0);
-            Bytes::copy_from_slice(&*webp)
+            Bytes::copy_from_slice(&webp)
         };
         let small = {
             let image = image.resize(600, u32::MAX, FilterType::Lanczos3);
             let encoder = Encoder::from_image(&image).expect("WEBP encoding implemented for RGB");
             let webp = encoder.encode(75.0);
-            Bytes::copy_from_slice(&*webp)
+            Bytes::copy_from_slice(&webp)
         };
 
         Ok(WebpOutput { small, large })
