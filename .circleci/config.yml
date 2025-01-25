@@ -3,6 +3,7 @@
 version: 2.1
 orbs:
   rust: circleci/rust@1.6.2
+  docker: circleci/docker@2.8.1
 
 commands:
   install_deps:
@@ -48,60 +49,46 @@ jobs:
             - target
 
   docker-build-arm64:
-    resource_class: arm-medium
-    docker:
-      - image: cimg/base:current
-        auth:
-          username: ansg191
-          password: $DOCKERHUB_PASSWORD
+    executor:
+      name: docker/machine
+      resource-class: arm.medium
     steps:
       - checkout
-      - setup_remote_docker:
-          docker_layer_caching: true
-      - run:
-          name: Build Docker image
-          command: |
-            TAG=latest-arm64
-            docker build -t ansg191/pp-tree-importer2:$TAG --progress=plain .
-      - run:
-          name: Push Docker image
-          command: |
-            TAG=latest-arm64
-            echo $DOCKERHUB_PASSWORD | docker login -u ansg191 --password-stdin
-            docker push ansg191/pp-tree-importer2:$TAG
+      - docker/check:
+          arch: arm64
+          docker-password: DOCKERHUB_PASSWORD
+      - docker/build:
+          image: ansg191/pp-tree-importer2
+          tag: latest-arm64
+          cache_from: ansg191/pp-tree-importer2:cache-arm64
+          cache_to: ansg191/pp-tree-importer2:cache-arm64
+      - docker/push:
+          image: ansg191/pp-tree-importer2
+          tag: latest-arm64
 
   docker-build-amd64:
-    resource_class: medium
-    docker:
-      - image: cimg/base:current
-        auth:
-          username: ansg191
-          password: $DOCKERHUB_PASSWORD
+    executor:
+      name: docker/machine
+      resource-class: medium
     steps:
       - checkout
-      - setup_remote_docker:
-          docker_layer_caching: true
-      - run:
-          name: Build Docker image
-          command: |
-            TAG=latest-amd64
-            docker build -t ansg191/pp-tree-importer2:$TAG --progress=plain .
-      - run:
-          name: Push Docker image
-          command: |
-            TAG=latest-amd64
-            echo $DOCKERHUB_PASSWORD | docker login -u ansg191 --password-stdin
-            docker push ansg191/pp-tree-importer2:$TAG
+      - docker/check:
+          arch: amd64
+          docker-password: DOCKERHUB_PASSWORD
+      - docker/build:
+          image: ansg191/pp-tree-importer2
+          tag: latest-amd64
+          cache_from: ansg191/pp-tree-importer2:cache-amd64
+          cache_to: ansg191/pp-tree-importer2:cache-amd64
+      - docker/push:
+          image: ansg191/pp-tree-importer2
+          tag: latest-amd64
 
   docker-build:
-    docker:
-      - image: cimg/base:current
-        auth:
-          username: ansg191
-          password: $DOCKERHUB_PASSWORD
+    executor:
+      name: docker/machine
+      resource-class: medium
     steps:
-      - setup_remote_docker:
-          docker_layer_caching: true
       - run:
           name: Create Multi-Arch Manifest
           command: |
