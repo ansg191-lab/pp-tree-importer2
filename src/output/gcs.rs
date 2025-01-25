@@ -68,10 +68,12 @@ impl GCSBucket {
         cache_control: impl Into<String>,
     ) -> Result<Object, Error> {
         let mime = Mime::from_str(content_type.as_ref())?;
-        let mut obj = Object::default();
-        obj.cache_control = Some(cache_control.into());
-        obj.content_type = Some(mime.essence_str().to_owned());
-        obj.name = Some(path.into());
+        let obj = Object {
+            cache_control: Some(cache_control.into()),
+            content_type: Some(mime.essence_str().to_owned()),
+            name: Some(path.into()),
+            ..Default::default()
+        };
 
         let stream = Cursor::new(data);
         let (_, obj) = self
@@ -165,5 +167,5 @@ fn compute_path(id: &str, tp: ImageType) -> String {
 
 fn compute_hash(data: &Bytes) -> String {
     let digest = md5::compute(data);
-    BASE64_STANDARD.encode(&*digest)
+    BASE64_STANDARD.encode(*digest)
 }
