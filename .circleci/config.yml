@@ -32,7 +32,7 @@ jobs:
       - checkout
       - install_deps
       - restore_cache:
-          key: cargo-test-rust-{{ checksum "Cargo.lock" }}
+          key: cargo-test-rust-v1-{{ checksum "Cargo.lock" }}
       - run:
           name: Install cargo-nextest
           command: curl -LsSf https://get.nexte.st/latest/linux | tar zxf - -C ${CARGO_HOME:-~/.cargo}/bin
@@ -42,9 +42,9 @@ jobs:
       - store_test_results:
           path: target/nextest/ci
       - save_cache:
-          key: cargo-test-rust-{{ checksum "Cargo.lock" }}
+          key: cargo-test-rust-v1-{{ checksum "Cargo.lock" }}
           paths:
-            - ~/.cargo
+            - /usr/local/cargo
             - target
 
   docker-build-arm64:
