@@ -5,7 +5,7 @@ use geojson::{Feature, FeatureCollection};
 use peak_alloc::PeakAlloc;
 use tokio::time::Instant;
 use tracing::{debug, error, info};
-use tracing_subscriber::{fmt, layer::SubscriberExt, util::SubscriberInitExt, EnvFilter};
+use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt, EnvFilter};
 
 use crate::{
     config::Config,
@@ -32,14 +32,14 @@ static PEAK_ALLOC: PeakAlloc = PeakAlloc;
 
 #[tokio::main]
 async fn main() -> Result<(), Error> {
+    let config = Config::from_env()?;
+
     tracing_subscriber::registry()
-        .with(fmt::layer())
+        .with(config.log_format.into_layer())
         .with(EnvFilter::from_default_env())
         .init();
 
     let now = Instant::now();
-
-    let config = Config::from_env()?;
     info!(
         config.gdrive_folder_id,
         config.bucket_name, config.concurrency, "Starting sync"

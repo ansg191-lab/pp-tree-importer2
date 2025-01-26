@@ -7,6 +7,8 @@ pub enum Error {
     Google(#[from] google_apis_common::Error),
     #[error("env var error: {0}")]
     EnvVar(#[from] std::env::VarError),
+    #[error("unknown log type: {0}")]
+    UnknownLogType(String),
     #[error("config parse error: {0}")]
     Config(#[from] std::num::ParseIntError),
     #[error("io error: {0}")]
