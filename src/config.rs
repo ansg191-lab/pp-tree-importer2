@@ -2,12 +2,13 @@ use std::{env::VarError, sync::Arc};
 
 use tracing::Subscriber;
 use tracing_subscriber::{registry::LookupSpan, Layer};
+use valuable::{Valuable, Value, Visit};
 
 use crate::error::Error;
 
 const CPU_MULTIPLIER: usize = 3;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Valuable)]
 pub struct Config {
     pub log_format: LogFormat,
     pub gdrive_folder_id: String,
@@ -55,5 +56,17 @@ impl LogFormat {
             Self::Text => Layer::boxed(tracing_subscriber::fmt::layer()),
             Self::Json => Layer::boxed(tracing_subscriber::fmt::layer().json()),
         }
+    }
+}
+
+impl Valuable for LogFormat {
+    fn as_value(&self) -> Value<'_> {
+        match self {
+            Self::Text => "text".into(),
+            Self::Json => "json".into(),
+        }
+    }
+    fn visit(&self, visit: &mut dyn Visit) {
+        visit.visit_value(self.as_value())
     }
 }

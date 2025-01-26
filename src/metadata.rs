@@ -11,6 +11,7 @@ use time::{
     OffsetDateTime,
 };
 use tracing::{debug, error};
+use valuable::Valuable;
 
 use crate::{error::Error, image_source::Image};
 
@@ -71,7 +72,44 @@ impl From<Tree> for Feature {
     }
 }
 
-#[derive(Debug, Copy, Clone, PartialEq)]
+const _: () = {
+    use valuable::{Fields, NamedField, NamedValues, StructDef, Structable, Value, Visit};
+
+    static TREE_FIELDS: &[NamedField<'static>] = &[
+        NamedField::new("image"),
+        NamedField::new("location"),
+        NamedField::new("timestamp"),
+    ];
+    #[automatically_derived]
+    impl Structable for Tree {
+        fn definition(&self) -> StructDef<'_> {
+            StructDef::new_static("Tree", Fields::Named(TREE_FIELDS))
+        }
+    }
+    #[automatically_derived]
+    impl Valuable for Tree {
+        fn as_value(&self) -> Value<'_> {
+            Value::Structable(self)
+        }
+        fn visit(&self, visitor: &mut dyn Visit) {
+            visitor.visit_named_fields(&NamedValues::new(
+                TREE_FIELDS,
+                &[
+                    Valuable::as_value(&self.image),
+                    Valuable::as_value(&self.location),
+                    Valuable::as_value(
+                        &self
+                            .timestamp
+                            .format(&Iso8601::DEFAULT)
+                            .expect("Timestamp should always format successfully"),
+                    ),
+                ],
+            ));
+        }
+    }
+};
+
+#[derive(Debug, Copy, Clone, PartialEq, Valuable)]
 pub struct Location {
     pub lat: f64,
     pub lon: f64,

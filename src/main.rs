@@ -6,6 +6,7 @@ use peak_alloc::PeakAlloc;
 use tokio::time::Instant;
 use tracing::{debug, error, info};
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt, EnvFilter};
+use valuable::Valuable;
 
 use crate::{
     config::Config,
@@ -40,10 +41,7 @@ async fn main() -> Result<(), Error> {
         .init();
 
     let now = Instant::now();
-    info!(
-        config.gdrive_folder_id,
-        config.bucket_name, config.concurrency, "Starting sync"
-    );
+    info!(config = config.as_value(), "Starting sync");
 
     let gdrive = GDrive::new(Arc::clone(&config)).await?;
     let converters = converter::converters();
@@ -103,21 +101,11 @@ async fn process_image(
     let bytes = match gdrive.image_data(&image).await {
         Ok(b) => b,
         Err(err) => {
-            error!(
-                %err,
-                image.id = image.id,
-                image.path = image.full_path,
-                "Error downloading image"
-            );
+            error!(%err, image = image.as_value(), "Error downloading image");
             return None;
         }
     };
-    info!(
-        image.id = image.id,
-        image.path = image.full_path,
-        duration = ?now.elapsed(),
-        "Downloaded image"
-    );
+    info!(image = image.as_value(), duration = ?now.elapsed(), "Downloaded image");
 
     // Run processing jobs on blocking threads
     let now = Instant::now();
@@ -137,10 +125,7 @@ async fn process_image(
         move || {
             for conv in &*converters {
                 if conv.supported_mime_types().contains(&&*image.mime) {
-                    debug!(
-                        image.id,
-                        image.full_path, image.mime, "Converting image to webp"
-                    );
+                    debug!(image = image.as_value(), "Converting image to webp");
                     return conv.convert(bytes);
                 }
             }
@@ -151,34 +136,22 @@ async fn process_image(
     let tree = match tree_task.await.expect("Tree task shouldn't panic") {
         Ok(t) => t,
         Err(err) => {
-            error!(
-                %err,
-                image.id = image.id,
-                image.path = image.full_path,
-                "Error extracting metadata from image"
-            );
+            error!(%err, image = image.as_value(), "Error extracting metadata from image");
             return None;
         }
     };
     let webp = match convert_task.await.expect("Convert task shouldn't panic") {
         Ok(t) => t,
         Err(err) => {
-            error!(
-                %err,
-                image.id = image.id,
-                image.path = image.full_path,
-                "Error converting image to webp"
-            );
+            error!(%err, image = image.as_value(), "Error converting image to webp");
             return None;
         }
     };
 
     info!(
-        image.id = image.id,
-        image.path = image.full_path,
+        image = image.as_value(),
+        tree = tree.as_value(),
         duration = ?now.elapsed(),
-        location.lat = tree.location.lat,
-        location.lon = tree.location.lon,
         webp.small = webp.small.len(),
         webp.large = webp.large.len(),
         "Finished processing image"
@@ -192,22 +165,12 @@ async fn process_image(
     ) {
         (Ok(()), Ok(())) => (),
         (Err(err), _) | (_, Err(err)) => {
-            error!(
-                %err,
-                image.id = image.id,
-                image.path = image.full_path,
-                "Error uploading image to GCS"
-            );
+            error!(%err, image = image.as_value(), "Error uploading image to GCS");
             return None;
         }
     }
 
-    info!(
-        image.id = image.id,
-        image.path = image.full_path,
-        duration = ?now.elapsed(),
-        "Uploaded images to GCS"
-    );
+    info!(image = image.as_value(), duration = ?now.elapsed(), "Uploaded images to GCS");
 
     Some(tree)
 }

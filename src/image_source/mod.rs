@@ -4,6 +4,7 @@ use std::{convert::Infallible, fmt::Display, future::Future, str::FromStr};
 use bytes::Bytes;
 use futures::Stream;
 pub use gdrive::GDrive;
+use valuable::{Valuable, Value, Visit};
 
 use crate::error::Error;
 
@@ -15,7 +16,7 @@ pub trait ImageSource {
     fn image_data(&self, image: &Image) -> impl Future<Output = Result<Bytes, Error>> + Send;
 }
 
-#[derive(Debug, Clone, Eq, PartialEq)]
+#[derive(Debug, Clone, Eq, PartialEq, Valuable)]
 pub struct Image {
     /// Unique image ID
     pub id: String,
@@ -63,5 +64,14 @@ impl Tag {
 impl Display for Tag {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.as_str())
+    }
+}
+
+impl Valuable for Tag {
+    fn as_value(&self) -> Value<'_> {
+        Value::String(self.as_str())
+    }
+    fn visit(&self, visit: &mut dyn Visit) {
+        visit.visit_value(self.as_value())
     }
 }

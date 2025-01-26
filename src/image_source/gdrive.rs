@@ -13,6 +13,7 @@ use tokio::sync::mpsc;
 use tokio_stream::wrappers::UnboundedReceiverStream;
 use tracing::{debug, info, trace, warn};
 use unwrap_infallible::UnwrapInfallible;
+use valuable::Valuable;
 
 use crate::{
     config::Config,
@@ -102,7 +103,7 @@ impl GDriveInner {
     #[tracing::instrument(
         skip_all,
         fields(
-            tag = %tag,
+            tag = tag.as_value(),
             folder.id = %folder.id.as_deref().unwrap_or_default(),
             full_path = %full_path.as_ref(),
         )
@@ -147,7 +148,7 @@ impl GDriveInner {
                         folder_id,
                         folder_name = folder.name.as_deref().unwrap_or_default(),
                         full_path,
-                        tag = ?tag,
+                        tag = tag.as_value(),
                         "Unsupported file type"
                     );
                 }
@@ -168,7 +169,7 @@ impl ImageSource for GDrive {
             let tags = trys!(tx, inner.get_tags().await);
             for (tag, folder) in tags {
                 info!(
-                    tag = ?tag,
+                    tag = tag.as_value(),
                     folder_id = folder.id.as_deref().unwrap_or_default(),
                     folder_name = folder.name.as_deref().unwrap_or_default(),
                     "Searching tag folder"
@@ -182,15 +183,7 @@ impl ImageSource for GDrive {
         UnboundedReceiverStream::new(rx)
     }
 
-    #[tracing::instrument(
-        skip_all,
-        fields(
-            image.id = %image.id,
-            image.full_path = %image.full_path,
-            image.tag = %image.tag,
-            image.mime = %image.mime,
-        )
-    )]
+    #[tracing::instrument(skip_all, fields(image = image.as_value()))]
     async fn image_data(&self, image: &Image) -> Result<Bytes, Error> {
         debug!("Downloading image");
         let (res, _) = self

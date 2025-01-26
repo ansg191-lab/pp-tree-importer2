@@ -27,9 +27,10 @@ thiserror = "2.0.11"
 time = { version = "0.3.37", features = ["parsing", "macros", "formatting"] }
 tokio = { version = "1.43.0", features = ["rt", "rt-multi-thread", "macros", "sync"] }
 tokio-stream = { version = "0.1.17", features = ["sync"] }
-tracing = "0.1.41"
-tracing-subscriber = { version = "0.3.19", features = ["env-filter", "json"] }
+tracing = { version = "0.1.41", features = ["valuable"] }
+tracing-subscriber = { version = "0.3.19", features = ["env-filter", "json", "valuable"] }
 unwrap-infallible = "0.1.5"
+valuable = { version = "0.1.1", features = ["derive"] }
 webp = "0.3.0"
 yup-oauth2 = "11.0.0"
 
