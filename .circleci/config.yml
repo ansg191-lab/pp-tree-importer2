@@ -20,7 +20,7 @@ jobs:
     docker:
       - image: rust:1.84-bookworm
     environment:
-      RUSTFLAGS: "-D warnings"
+      RUSTFLAGS: "--cfg tracing_unstable -D warnings"
     steps:
       - checkout
       - install_deps
@@ -42,7 +42,7 @@ jobs:
     docker:
       - image: cimg/rust:1.84.0
     environment:
-      RUSTFLAGS: "-D warnings"
+      RUSTFLAGS: "--cfg tracing_unstable -D warnings"
     steps:
       - checkout
       - run:
