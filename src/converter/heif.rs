@@ -23,10 +23,6 @@ impl HeifConverter {
 }
 
 impl Converter for HeifConverter {
-    fn supported_mime_types(&self) -> &[&str] {
-        &["image/heif", "image/heic"]
-    }
-
     #[tracing::instrument(skip_all)]
     fn convert(&self, data: Bytes) -> Result<WebpOutput, Error> {
         let ctx = HeifContext::read_from_bytes(&data)?;

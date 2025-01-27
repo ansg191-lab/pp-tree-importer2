@@ -10,7 +10,7 @@ use valuable::Valuable;
 
 use crate::{
     config::Config,
-    converter::Converter,
+    converter::ImageConverter,
     error::Error,
     image_source::{GDrive, Image, ImageSource},
     metadata::Tree,
@@ -25,8 +25,6 @@ mod image_source;
 mod macros;
 mod metadata;
 mod output;
-
-const ALLOWED_MIME_TYPES: [&str; 3] = ["image/heif", "image/jpeg", "image/png"];
 
 #[global_allocator]
 static PEAK_ALLOC: PeakAlloc = PeakAlloc;
@@ -44,13 +42,13 @@ async fn main() -> Result<(), Error> {
     info!(config = config.as_value(), "Starting sync");
 
     let gdrive = GDrive::new(Arc::clone(&config)).await?;
-    let converters = converter::converters();
+    let converter = Arc::new(ImageConverter::new());
     let output = GCSBucket::new(Arc::clone(&config)).await?;
 
     // Run download and processing
     let trees = gdrive
         .images()
-        .map(|res| process_image(&gdrive, Arc::clone(&converters), &output, res))
+        .map(|res| process_image(&gdrive, Arc::clone(&converter), &output, res))
         .buffer_unordered(config.concurrency)
         .filter_map(|x| async move { x })
         .collect::<Vec<Tree>>()
@@ -84,7 +82,7 @@ async fn main() -> Result<(), Error> {
 
 async fn process_image(
     gdrive: &GDrive,
-    converters: Arc<[Box<dyn Converter>]>,
+    converter: Arc<ImageConverter>,
     out: &GCSBucket,
     res: Result<Image, Error>,
 ) -> Option<Tree> {
@@ -120,16 +118,11 @@ async fn process_image(
     // Convert images
     let convert_task = tokio::task::spawn_blocking({
         let bytes = bytes.clone();
-        let converters = Arc::clone(&converters);
+        let conv = Arc::clone(&converter);
         let image = image.clone();
         move || {
-            for conv in &*converters {
-                if conv.supported_mime_types().contains(&&*image.mime) {
-                    debug!(image = image.as_value(), "Converting image to webp");
-                    return conv.convert(bytes);
-                }
-            }
-            Err(Error::NoAvailableConverter)
+            debug!(image = image.as_value(), "Converting image to webp");
+            conv.convert(image.format, bytes)
         }
     });
 

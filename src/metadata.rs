@@ -23,15 +23,7 @@ pub struct Tree {
 }
 
 impl Tree {
-    #[tracing::instrument(
-        skip_all,
-        fields(
-            image.id = %image.id,
-            image.full_path = %image.full_path,
-            image.tag = %image.tag,
-            image.mime = %image.mime,
-        )
-    )]
+    #[tracing::instrument(skip_all, fields(image = image.as_value()))]
     pub fn new(image: Image, data: Bytes) -> Result<Self, Error> {
         debug!("Reading EXIF data from image");
         let exif = Reader::new().read_from_container(&mut Cursor::new(data))?;

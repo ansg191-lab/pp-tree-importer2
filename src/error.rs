@@ -33,9 +33,6 @@ pub enum Error {
     TimeParse(#[from] time::error::Parse),
 
     // Converter Errors
-    #[error("no available converter")]
-    NoAvailableConverter,
-
     #[error("image error: {0}")]
     Image(#[from] image::ImageError),
     #[error("invalid pixel layout")]

@@ -6,7 +6,7 @@ use futures::Stream;
 pub use gdrive::GDrive;
 use valuable::{Valuable, Value, Visit};
 
-use crate::error::Error;
+use crate::{converter::ImageFormat, error::Error};
 
 pub trait ImageSource {
     /// Get a stream of images
@@ -29,7 +29,7 @@ pub struct Image {
     /// File hash
     pub digest: String,
     /// Mime Type
-    pub mime: String,
+    pub format: ImageFormat,
 }
 
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]

@@ -17,11 +17,11 @@ use valuable::Valuable;
 
 use crate::{
     config::Config,
+    converter::ImageFormat,
     error::Error,
     http::{get_google_default_creds, hyper_client},
     image_source::{Image, ImageSource, Tag},
     macros::{trys, yield_from},
-    ALLOWED_MIME_TYPES,
 };
 
 const FOLDER_MIME_TYPE: &str = "application/vnd.google-apps.folder";
@@ -130,9 +130,9 @@ impl GDriveInner {
 
             for file in files {
                 let mime_type = file.mime_type.as_deref().unwrap_or_default();
-                if ALLOWED_MIME_TYPES.contains(&mime_type) {
+                if let Some(format) = ImageFormat::from_mime(mime_type) {
                     // Image
-                    let img = trys!(tx, create_image(file, tag, full_path));
+                    let img = trys!(tx, create_image(file, tag, full_path, format));
                     if tx.send(Ok(img)).is_err() {
                         return;
                     }
@@ -205,13 +205,18 @@ impl ImageSource for GDrive {
     }
 }
 
-fn create_image(file: File, tag: Tag, full_path: &str) -> Result<Image, Error> {
+fn create_image(
+    file: File,
+    tag: Tag,
+    full_path: &str,
+    format: ImageFormat,
+) -> Result<Image, Error> {
     Ok(Image {
         id: file.id.ok_or(Error::MissingRequiredField("id"))?,
         full_path: format!("{full_path}/{}", file.name.as_deref().unwrap_or_default()),
         name: file.name.unwrap_or_default(),
         tag,
         digest: file.sha1_checksum.unwrap_or_default(),
-        mime: file.mime_type.unwrap_or_default(),
+        format,
     })
 }

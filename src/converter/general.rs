@@ -14,10 +14,6 @@ use crate::{
 pub struct General;
 
 impl Converter for General {
-    fn supported_mime_types(&self) -> &[&str] {
-        &["image/jpeg", "image/png"]
-    }
-
     fn convert(&self, data: Bytes) -> Result<WebpOutput, Error> {
         // Load image and fix orientation
         let mut decoder = ImageReader::new(Cursor::new(data))
