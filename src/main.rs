@@ -37,6 +37,7 @@ async fn main() -> Result<(), Error> {
         .with(config.log_format.into_layer())
         .with(EnvFilter::from_default_env())
         .init();
+    std::panic::set_hook(Box::new(tracing_panic::panic_hook));
 
     let now = Instant::now();
     info!(config = config.as_value(), "Starting sync");
