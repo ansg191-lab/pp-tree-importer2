@@ -30,7 +30,7 @@ pub enum Error {
     #[error("exif utf8 parse error: {0}")]
     ExifUtf8Parse(#[from] std::str::Utf8Error),
     #[error("time parse error: {0}")]
-    TimeParse(#[from] time::error::Parse),
+    TimeParse(#[from] chrono::ParseError),
 
     // Converter Errors
     #[error("image error: {0}")]

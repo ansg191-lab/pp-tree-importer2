@@ -3,13 +3,9 @@
 use std::io::Cursor;
 
 use bytes::Bytes;
+use chrono::{DateTime, FixedOffset};
 use exif::{Exif, In, Reader, Tag, Value};
 use geojson::{feature::Id, Feature, Geometry, JsonObject};
-use time::{
-    format_description::{well_known::Iso8601, BorrowedFormatItem},
-    macros::format_description,
-    OffsetDateTime,
-};
 use tracing::{debug, error};
 use valuable::Valuable;
 
@@ -19,7 +15,7 @@ use crate::{error::Error, image_source::Image};
 pub struct Tree {
     pub image: Image,
     pub location: Location,
-    pub timestamp: OffsetDateTime,
+    pub timestamp: DateTime<FixedOffset>,
 }
 
 impl Tree {
@@ -41,10 +37,7 @@ impl Tree {
 impl From<Tree> for Feature {
     fn from(value: Tree) -> Self {
         let geo = Geometry::from(value.location);
-        let timestamp = value
-            .timestamp
-            .format(&Iso8601::DEFAULT)
-            .expect("Timestamp should always format successfully");
+        let timestamp = value.timestamp.to_rfc3339();
         Self {
             bbox: None,
             geometry: Some(geo),
@@ -89,12 +82,7 @@ const _: () = {
                 &[
                     Valuable::as_value(&self.image),
                     Valuable::as_value(&self.location),
-                    Valuable::as_value(
-                        &self
-                            .timestamp
-                            .format(&Iso8601::DEFAULT)
-                            .expect("Timestamp should always format successfully"),
-                    ),
+                    Valuable::as_value(&self.timestamp.to_rfc3339()),
                 ],
             ));
         }
@@ -161,7 +149,7 @@ fn get_gps(exif: &Exif, tag: Tag, tag_ref: Tag) -> Result<f64, Error> {
     Ok(value * dir)
 }
 
-fn get_timestamp(exif: &Exif) -> Result<OffsetDateTime, Error> {
+fn get_timestamp(exif: &Exif) -> Result<DateTime<FixedOffset>, Error> {
     // Get fields for original datetime
     let datetime_field = exif
         .get_field(Tag::DateTimeOriginal, In::PRIMARY)
@@ -188,16 +176,14 @@ fn get_timestamp(exif: &Exif) -> Result<OffsetDateTime, Error> {
     let full_datetime = format!("{} {}", datetime, offset);
 
     // Parse into `OffsetDateTime`
-    const FORMAT: &[BorrowedFormatItem] = format_description!(
-        "[year]:[month]:[day] [hour]:[minute]:[second] [offset_hour]:[offset_minute]"
-    );
-    Ok(OffsetDateTime::parse(full_datetime.as_str(), FORMAT)?)
+    const FORMAT: &str = "%Y:%m:%d %H:%M:%S %:z";
+    Ok(DateTime::parse_from_str(full_datetime.as_str(), FORMAT)?)
 }
 
 #[cfg(test)]
 mod tests {
     use approx::assert_relative_eq;
-    use time::{Month, UtcOffset};
+    use chrono::{Datelike, Month, Timelike};
 
     use super::*;
 
@@ -210,12 +196,15 @@ mod tests {
 
         let timestamp = get_timestamp(&exif).unwrap();
         assert_eq!(timestamp.year(), 2025);
-        assert_eq!(timestamp.month(), Month::January);
+        assert_eq!(timestamp.month(), Month::January.number_from_month());
         assert_eq!(timestamp.day(), 18);
         assert_eq!(timestamp.hour(), 12);
         assert_eq!(timestamp.minute(), 14);
         assert_eq!(timestamp.second(), 0);
-        assert_eq!(timestamp.offset(), UtcOffset::from_hms(-8, 0, 0).unwrap());
+        assert_eq!(
+            *timestamp.offset(),
+            FixedOffset::west_opt(8 * 3600).unwrap()
+        );
     }
 
     #[test]
