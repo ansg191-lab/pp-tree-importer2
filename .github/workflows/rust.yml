@@ -15,10 +15,10 @@ jobs:
   test:
     name: Test
     runs-on: ubuntu-latest
-    container: rust:1.84-bookworm
+    container: rust:1.84-bookworm@sha256:738ae99a3d75623f41e6882566b4ef37e38a9840244a47efd4a0ca22e9628b88
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
 
       - name: Install deps
         run: |
@@ -27,7 +27,7 @@ jobs:
           apt-get install -y pkg-config libclang-dev libheif1/bookworm-backports libheif-dev/bookworm-backports
 
       - name: Rust Cache
-        uses: Swatinem/rust-cache@v2
+        uses: Swatinem/rust-cache@f0deed1e0edfc6a9be95417288c0e1099b1eeec3 # v2
 
       - name: Run tests
         run: cargo test
@@ -36,7 +36,7 @@ jobs:
     name: Rustfmt
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
       - name: Install Rust
         uses: dtolnay/rust-toolchain@nightly
         with:
@@ -48,9 +48,9 @@ jobs:
   clippy:
     name: Clippy
     runs-on: ubuntu-latest
-    container: rust:1.84-bookworm
+    container: rust:1.84-bookworm@sha256:738ae99a3d75623f41e6882566b4ef37e38a9840244a47efd4a0ca22e9628b88
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
 
       - name: Install deps
         run: |
@@ -59,7 +59,7 @@ jobs:
           apt-get install -y pkg-config libclang-dev libheif1/bookworm-backports libheif-dev/bookworm-backports
 
       - name: Rust Cache
-        uses: Swatinem/rust-cache@v2
+        uses: Swatinem/rust-cache@f0deed1e0edfc6a9be95417288c0e1099b1eeec3 # v2
       - name: Install Clippy
         run: rustup component add clippy
 
@@ -76,7 +76,7 @@ jobs:
           - bans licenses sources
     continue-on-error: ${{ matrix.checks == 'advisories' }}
     steps:
-      - uses: actions/checkout@v4
-      - uses: EmbarkStudios/cargo-deny-action@v2
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+      - uses: EmbarkStudios/cargo-deny-action@e2f4ede4a4e60ea15ff31bc0647485d80c66cfba # v2
         with:
           command: check ${{ matrix.checks }}

@@ -36,7 +36,7 @@ webp = "0.3.0"
 yup-oauth2 = "11.0.0"
 
 [dev-dependencies]
-approx = "0.5.1"
+approx = "=0.5.1"
 
 # Speed up debug builds
 [profile.dev.package.image]
