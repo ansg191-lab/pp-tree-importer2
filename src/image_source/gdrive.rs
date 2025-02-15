@@ -63,7 +63,7 @@ impl GDriveInner {
                 .add_scope(Scope::Readonly)
                 .param(
                     "fields",
-                    "nextPageToken, files(id, name, mimeType, sha1Checksum)",
+                    "nextPageToken, files(id, name, mimeType, createdTime, modifiedTime, sha1Checksum)",
                 );
             let (_, file_list) = if let Some(token) = page_token.as_deref() {
                 file_list.page_token(token).doit().await
@@ -218,5 +218,7 @@ fn create_image(
         tag,
         digest: file.sha1_checksum.unwrap_or_default(),
         format,
+        created: file.created_time.unwrap_or_default(),
+        modified: file.modified_time.unwrap_or_default(),
     })
 }
