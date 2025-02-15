@@ -30,8 +30,13 @@ RUN echo "deb http://deb.debian.org/debian bookworm-backports main" > /etc/apt/s
         libaom3 libdav1d6 libde265-0 libheif-plugin-aomenc libheif-plugin-dav1d libheif-plugin-libde265 \
         libheif-plugin-x265 libnuma1 libx265-199 \
       zlib1g && \
-    mkdir /dpkg && \
-    for deb in *.deb; do dpkg --extract $deb /dpkg || exit 10; done
+    mkdir -p /dpkg/var/lib/dpkg/status.d/ && \
+    for deb in *.deb; do \
+      package_name=$(dpkg-deb -I ${deb} | awk '/^ Package: .*$/ {print $2}'); \
+      echo "Process: ${package_name}"; \
+      dpkg --ctrl-tarfile $deb | tar -Oxvf - ./control > /dpkg/var/lib/dpkg/status.d/${package_name}; \
+      dpkg --extract $deb /dpkg || exit 10; \
+    done
 
 # Final runtime image
 FROM gcr.io/distroless/cc-debian12:nonroot@sha256:6970a2b2cb07c68f3e15d1b5d2ba857e53da911d5d321f48a842d6b0d26984cf AS final
