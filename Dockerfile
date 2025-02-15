@@ -1,5 +1,5 @@
 # Setup build environment
-FROM lukemathwalker/cargo-chef:latest-rust-slim-bookworm AS chef
+FROM lukemathwalker/cargo-chef:latest-rust-slim-bookworm@sha256:8d2b12e083062098653e98fa2a3d7c0d6b0534ae9a852b3dfe107d2b4ce01ba1 AS chef
 WORKDIR /app
 
 RUN echo "deb http://deb.debian.org/debian bookworm-backports main" > /etc/apt/sources.list.d/bookworm-backports.list && \
@@ -21,7 +21,7 @@ RUN cargo build --release
 
 # Runtime dependency extractor
 # Copied from https://github.com/GoogleContainerTools/distroless/issues/863
-FROM debian:12 AS deb_extractor
+FROM debian:12@sha256:4abf773f2a570e6873259c4e3ba16de6c6268fb571fd46ec80be7c67822823b3 AS deb_extractor
 RUN echo "deb http://deb.debian.org/debian bookworm-backports main" > /etc/apt/sources.list.d/bookworm-backports.list && \
     cd /tmp && \
     apt-get update && \
@@ -34,7 +34,7 @@ RUN echo "deb http://deb.debian.org/debian bookworm-backports main" > /etc/apt/s
     for deb in *.deb; do dpkg --extract $deb /dpkg || exit 10; done
 
 # Final runtime image
-FROM gcr.io/distroless/cc-debian12:nonroot AS final
+FROM gcr.io/distroless/cc-debian12:nonroot@sha256:6970a2b2cb07c68f3e15d1b5d2ba857e53da911d5d321f48a842d6b0d26984cf AS final
 
 COPY --from=deb_extractor /dpkg /
 COPY --from=builder /app/target/release/pp-tree-importer /bin/pp-tree-importer
