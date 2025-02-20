@@ -5,7 +5,7 @@ use std::io::Cursor;
 use bytes::Bytes;
 use chrono::{DateTime, FixedOffset};
 use exif::{Exif, In, Reader, Tag, Value};
-use geojson::{feature::Id, Feature, Geometry, JsonObject};
+use geojson::{Feature, Geometry, JsonObject, feature::Id};
 use tracing::{debug, error};
 use valuable::Valuable;
 

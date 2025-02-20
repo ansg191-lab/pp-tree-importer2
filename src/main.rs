@@ -5,7 +5,7 @@ use geojson::{Feature, FeatureCollection};
 use peak_alloc::PeakAlloc;
 use tokio::time::Instant;
 use tracing::{debug, error, info};
-use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt, EnvFilter};
+use tracing_subscriber::{EnvFilter, layer::SubscriberExt, util::SubscriberInitExt};
 use valuable::Valuable;
 
 use crate::{

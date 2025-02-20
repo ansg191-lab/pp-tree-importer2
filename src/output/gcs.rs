@@ -1,9 +1,9 @@
 use std::{io::Cursor, str::FromStr, sync::Arc};
 
-use base64::{prelude::BASE64_STANDARD, Engine};
+use base64::{Engine, prelude::BASE64_STANDARD};
 use bytes::{BufMut, Bytes, BytesMut};
 use geojson::FeatureCollection;
-use google_storage1::{api::Object, Storage};
+use google_storage1::{Storage, api::Object};
 use hyper_rustls::HttpsConnector;
 use hyper_util::client::legacy::connect::HttpConnector;
 use mime::Mime;
@@ -97,38 +97,41 @@ impl GCSBucket {
         content_type: &str,
         cache_control: String,
     ) -> Result<Object, Error> {
-        if let Some(obj) = self.get_file(&path).await? {
-            // Object exists, check hash
-            if let Some(gcs_digest) = &obj.md5_hash {
-                let hash = compute_hash(&data);
-                if &hash == gcs_digest {
-                    debug!(
-                        path,
-                        hash, "Object exists and hash matches, skipping upload"
-                    );
-                    Ok(obj)
+        match self.get_file(&path).await? {
+            Some(obj) => {
+                // Object exists, check hash
+                if let Some(gcs_digest) = &obj.md5_hash {
+                    let hash = compute_hash(&data);
+                    if &hash == gcs_digest {
+                        debug!(
+                            path,
+                            hash, "Object exists and hash matches, skipping upload"
+                        );
+                        Ok(obj)
+                    } else {
+                        debug!(
+                            path,
+                            hash.local = hash,
+                            hash.gcs = gcs_digest,
+                            "Object exists but hash doesn't match, re-uploading"
+                        );
+                        Ok(self
+                            .upload_file_inner(&path, data, content_type, cache_control)
+                            .await?)
+                    }
                 } else {
-                    debug!(
-                        path,
-                        hash.local = hash,
-                        hash.gcs = gcs_digest,
-                        "Object exists but hash doesn't match, re-uploading"
-                    );
+                    warn!(path, "Object exists but has no hash, re-uploading");
                     Ok(self
                         .upload_file_inner(&path, data, content_type, cache_control)
                         .await?)
                 }
-            } else {
-                warn!(path, "Object exists but has no hash, re-uploading");
+            }
+            None => {
+                // Object doesn't exist, upload
                 Ok(self
                     .upload_file_inner(&path, data, content_type, cache_control)
                     .await?)
             }
-        } else {
-            // Object doesn't exist, upload
-            Ok(self
-                .upload_file_inner(&path, data, content_type, cache_control)
-                .await?)
         }
     }
 }

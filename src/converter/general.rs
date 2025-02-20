@@ -3,7 +3,7 @@
 use std::io::Cursor;
 
 use bytes::Bytes;
-use image::{imageops::FilterType, DynamicImage, ImageDecoder, ImageReader};
+use image::{DynamicImage, ImageDecoder, ImageReader, imageops::FilterType};
 use webp::Encoder;
 
 use crate::{
