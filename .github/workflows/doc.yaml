@@ -1,0 +1,45 @@
+name: Docs
+
+on:
+  push:
+    branches:
+      - main
+
+env:
+  CARGO_TERM_COLOR: always
+  RUSTFLAGS: '-D warnings --cfg tracing_unstable'
+  RUSTDOCFLAGS: '-Z unstable-options --show-type-layout --generate-link-to-definition'
+
+permissions:
+  pages: write
+  id-token: write
+
+jobs:
+  docs:
+    name: Github Pages
+    runs-on: ubuntu-latest
+    container: rust:1.84-bookworm@sha256:738ae99a3d75623f41e6882566b4ef37e38a9840244a47efd4a0ca22e9628b88
+
+    steps:
+      - uses: actions/checkout@v4.2.2
+      - uses: dtolnay/rust-toolchain@nightly
+      - name: Install deps
+        run: |
+          echo "deb http://deb.debian.org/debian bookworm-backports main" | tee /etc/apt/sources.list.d/bookworm-backports.list
+          apt-get update
+          apt-get install -y pkg-config libclang-dev libheif1/bookworm-backports libheif-dev/bookworm-backports
+
+      - name: Build docs
+        run: cargo doc --all --no-deps
+
+      - name: Create index
+        run: echo "<meta http-equiv=\"refresh\" content=\"0; url=pp_tree_importer\">" > target/doc/index.html
+
+      - name: Upload pages
+        uses: actions/upload-pages-artifact@v3.0.1
+        with:
+          path: './target/doc'
+
+      - name: Deploy
+        uses: actions/deploy-pages@v4.0.5
+        
