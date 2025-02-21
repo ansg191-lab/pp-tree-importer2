@@ -21,7 +21,7 @@ jobs:
     container: rust:1.84-bookworm@sha256:738ae99a3d75623f41e6882566b4ef37e38a9840244a47efd4a0ca22e9628b88
 
     steps:
-      - uses: actions/checkout@v4.2.2
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       - uses: dtolnay/rust-toolchain@nightly
       - name: Install deps
         run: |
@@ -36,10 +36,10 @@ jobs:
         run: echo "<meta http-equiv=\"refresh\" content=\"0; url=pp_tree_importer\">" > target/doc/index.html
 
       - name: Upload pages
-        uses: actions/upload-pages-artifact@v3.0.1
+        uses: actions/upload-pages-artifact@56afc609e74202658d3ffba0e8f6dda462b719fa # v3.0.1
         with:
           path: './target/doc'
 
       - name: Deploy
-        uses: actions/deploy-pages@v4.0.5
+        uses: actions/deploy-pages@d6db90164ac5ed86f2b6aed7e0febac5b3c0c03e # v4.0.5
         
