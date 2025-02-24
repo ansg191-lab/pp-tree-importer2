@@ -79,4 +79,5 @@ jobs:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
       - uses: EmbarkStudios/cargo-deny-action@13fd9ef18c30518efe066a8ac36cd629cc377507 # v2
         with:
+          rust-version: 1.85.0
           command: check ${{ matrix.checks }}
