@@ -1,7 +1,7 @@
 //! Convert using `libheif` to convert HEIF/HEIC files to WEBP
 
 use bytes::Bytes;
-use image::{imageops::FilterType, DynamicImage, RgbImage};
+use image::{DynamicImage, RgbImage, imageops::FilterType};
 use libheif_rs::{ColorSpace, HeifContext, LibHeif, RgbChroma};
 use webp::Encoder;
 

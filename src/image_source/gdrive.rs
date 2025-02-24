@@ -3,8 +3,8 @@ use std::{str::FromStr, sync::Arc};
 use bytes::Bytes;
 use futures::{Stream, StreamExt};
 use google_drive3::{
-    api::{File, Scope},
     DriveHub,
+    api::{File, Scope},
 };
 use http_body_util::BodyExt;
 use hyper_rustls::HttpsConnector;

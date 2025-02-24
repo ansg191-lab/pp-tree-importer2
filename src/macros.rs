@@ -1,5 +1,5 @@
 macro_rules! trys {
-    ($tx:expr, $expr:expr $(,)?) => {
+    ($tx:expr_2021, $expr:expr_2021 $(,)?) => {
         match $expr {
             std::result::Result::Ok(val) => val,
             std::result::Result::Err(err) => {
@@ -14,7 +14,7 @@ macro_rules! trys {
 pub(crate) use trys;
 
 macro_rules! yield_from {
-    ($tx:expr, $expr:expr $(,)?) => {{
+    ($tx:expr_2021, $expr:expr_2021 $(,)?) => {{
         let mut x = $expr;
         while let Some(result) = x.next().await {
             let val = trys!($tx, result);

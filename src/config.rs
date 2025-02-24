@@ -1,7 +1,7 @@
 use std::{env::VarError, sync::Arc};
 
 use tracing::Subscriber;
-use tracing_subscriber::{registry::LookupSpan, Layer};
+use tracing_subscriber::{Layer, registry::LookupSpan};
 use valuable::{Valuable, Value, Visit};
 
 use crate::error::Error;

@@ -2,12 +2,12 @@ use google_apis_common::GetToken;
 use hyper::body::Body;
 use hyper_rustls::HttpsConnector;
 use hyper_util::{
-    client::legacy::{connect::HttpConnector, Client},
+    client::legacy::{Client, connect::HttpConnector},
     rt::TokioExecutor,
 };
 use yup_oauth2::{
-    authenticator::ApplicationDefaultCredentialsTypes, ApplicationDefaultCredentialsAuthenticator,
-    ApplicationDefaultCredentialsFlowOpts,
+    ApplicationDefaultCredentialsAuthenticator, ApplicationDefaultCredentialsFlowOpts,
+    authenticator::ApplicationDefaultCredentialsTypes,
 };
 
 use crate::error::Error;
