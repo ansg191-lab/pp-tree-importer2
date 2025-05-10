@@ -1,5 +1,5 @@
 # Setup build environment
-FROM lukemathwalker/cargo-chef:latest-rust-slim-bookworm@sha256:976938d4c90a7e33c975655782dcbe63e8ccce716241a29bf90361e4fe8bbe8a AS chef
+FROM lukemathwalker/cargo-chef:latest-rust-slim-bookworm@sha256:938a1a0302da84dcd11a322710b85c53e2ec937c8e47616d2b271bd414a83dc2 AS chef
 WORKDIR /app
 
 RUN echo "deb http://deb.debian.org/debian bookworm-backports main" > /etc/apt/sources.list.d/bookworm-backports.list && \
