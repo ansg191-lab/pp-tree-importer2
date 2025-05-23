@@ -18,7 +18,7 @@ jobs:
   docs:
     name: Github Pages
     runs-on: ubuntu-latest
-    container: rust:1.86-bookworm@sha256:300ec56abce8cc9448ddea2172747d048ed902a3090e6b57babb2bf19f754081
+    container: rust:1.87-bookworm@sha256:25038aa450210c53cf05dbf7b256e1df1ee650a58bb46cbc7d6fa79c1d98d083
 
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
