@@ -44,6 +44,7 @@ skip-tree = [
     { crate = "windows-sys", reason = "Never up to date" },
     { crate = "matchers@0.1.0", reason = "Caused by: tracing-subscriber" },
     { crate = "thiserror@1.0.69", reason = "Caused by: jni, rav1e. Fixed in jni-rs/jni-rs#559, xiph/rav1e#3407" },
+    { crate = "system-deps@6.2.2", reason = "Caused by: rav1e"}
 ]
 
 # This section is considered when running `cargo deny check sources`.
