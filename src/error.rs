@@ -4,7 +4,7 @@ use thiserror::Error;
 #[derive(Debug, Error)]
 pub enum Error {
     #[error("gcloud error: {0}")]
-    Google(#[from] google_apis_common::Error),
+    Google(Box<google_apis_common::Error>),
     #[error("env var error: {0}")]
     EnvVar(#[from] std::env::VarError),
     #[error("unknown log type: {0}")]
@@ -54,4 +54,10 @@ pub enum Error {
     BadContentType(#[from] mime::FromStrError),
     #[error("json error: {0}")]
     Json(#[from] serde_json::Error),
+}
+
+impl From<google_apis_common::Error> for Error {
+    fn from(err: google_apis_common::Error) -> Self {
+        Error::Google(Box::new(err))
+    }
 }
