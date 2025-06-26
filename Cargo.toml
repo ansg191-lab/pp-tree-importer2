@@ -20,7 +20,7 @@ hyper-util = { version = "0.1.10", features = ["client", "tokio"] }
 image = "0.25.5"
 kamadak-exif = "0.6.1"
 libheif-rs = "2.0.0"
-md5 = "0.7.0"
+md5 = "0.8.0"
 mime = "0.3.17"
 num_cpus = "1.16.0"
 peak_alloc = "0.2.1"
