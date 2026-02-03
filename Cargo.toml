@@ -6,7 +6,7 @@ publish = false
 
 [dependencies]
 base64 = "0.22.1"
-bytes = "1.9.0"
+bytes = "1.11.1"
 chrono = { version = "0.4.39", default-features = false, features = ["std"] }
 futures = { version = "0.3", default-features = false, features = ["std", "async-await"] }
 geojson = "0.24.1"
