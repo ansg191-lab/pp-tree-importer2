@@ -640,7 +640,29 @@ dependencies = [
  "serde_with",
  "tokio",
  "url",
- "yup-oauth2",
+ "yup-oauth2 11.0.0",
+]
+
+[[package]]
+name = "google-apis-common"
+version = "8.0.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "020dd415ee200770d835d01674084400a4d11e6c108ae941f660e8264f49d4ca"
+dependencies = [
+ "base64",
+ "chrono",
+ "http",
+ "http-body-util",
+ "hyper",
+ "hyper-util",
+ "mime",
+ "percent-encoding",
+ "serde",
+ "serde_json",
+ "serde_with",
+ "tokio",
+ "url",
+ "yup-oauth2 12.1.2",
 ]
 
 [[package]]
@@ -650,7 +672,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "84e3944ee656d220932785cf1d8275519c0989830b9b239453983ac44f328d9f"
 dependencies = [
  "chrono",
- "google-apis-common",
+ "google-apis-common 7.0.0",
  "hyper",
  "hyper-rustls",
  "hyper-util",
@@ -660,7 +682,7 @@ dependencies = [
  "serde_with",
  "tokio",
  "url",
- "yup-oauth2",
+ "yup-oauth2 11.0.0",
 ]
 
 [[package]]
@@ -670,7 +692,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6d3992b096680be53ba78886d1e2e1cc988c9131344769faf1427ca9adab25d1"
 dependencies = [
  "chrono",
- "google-apis-common",
+ "google-apis-common 7.0.0",
  "hyper",
  "hyper-rustls",
  "hyper-util",
@@ -680,7 +702,7 @@ dependencies = [
  "serde_with",
  "tokio",
  "url",
- "yup-oauth2",
+ "yup-oauth2 11.0.0",
 ]
 
 [[package]]
@@ -1530,7 +1552,7 @@ dependencies = [
  "chrono",
  "futures",
  "geojson",
- "google-apis-common",
+ "google-apis-common 8.0.0",
  "google-drive3",
  "google-storage1",
  "http-body-util",
@@ -1553,7 +1575,7 @@ dependencies = [
  "unwrap-infallible",
  "valuable",
  "webp",
- "yup-oauth2",
+ "yup-oauth2 11.0.0",
 ]
 
 [[package]]
@@ -2877,6 +2899,29 @@ dependencies = [
  "seahash",
  "serde",
  "serde_json",
+ "time",
+ "tokio",
+ "url",
+]
+
+[[package]]
+name = "yup-oauth2"
+version = "12.1.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ef19a12dfb29fe39f78e1547e1be49717b84aef8762a4001359ed4f94d3accc1"
+dependencies = [
+ "async-trait",
+ "base64",
+ "http",
+ "http-body-util",
+ "hyper",
+ "hyper-util",
+ "log",
+ "percent-encoding",
+ "seahash",
+ "serde",
+ "serde_json",
+ "thiserror 2.0.12",
  "time",
  "tokio",
  "url",
