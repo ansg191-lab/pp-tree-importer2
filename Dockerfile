@@ -39,7 +39,7 @@ RUN echo "deb http://deb.debian.org/debian bookworm-backports main" > /etc/apt/s
     done
 
 # Final runtime image
-FROM gcr.io/distroless/cc-debian12:nonroot@sha256:a3c413a866ff27d0ae9e8555fd7c29991799aba085d1d7eb3348acac171a1752 AS final
+FROM gcr.io/distroless/cc-debian12:nonroot@sha256:9dac0a79194e45a7da0158a9c6da57b217585af0786db3845d1f0ec1a0dd182f AS final
 
 COPY --from=deb_extractor /dpkg /
 COPY --from=builder /app/target/release/pp-tree-importer /bin/pp-tree-importer
