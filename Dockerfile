@@ -21,7 +21,7 @@ RUN cargo build --release
 
 # Runtime dependency extractor
 # Copied from https://github.com/GoogleContainerTools/distroless/issues/863
-FROM debian:12@sha256:0d8498a0e9e6a60011df39aab78534cfe940785e7c59d19dfae1eb53ea59babe AS deb_extractor
+FROM debian:12@sha256:1d04200c2ece1d4d75a2a6f8e11ebce7d86a2ae28b34bb2c9cbb3ee9f4953e75 AS deb_extractor
 RUN echo "deb http://deb.debian.org/debian bookworm-backports main" > /etc/apt/sources.list.d/bookworm-backports.list && \
     cd /tmp && \
     apt-get update && \
